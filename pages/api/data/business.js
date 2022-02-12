@@ -1,5 +1,6 @@
 import dbConnect from "../../../db/database";
-import Business from "../../../models/business";
+import Business from "../../../models/Business";
+import { getSession } from "next-auth/react";
 
 dbConnect();
 
@@ -9,9 +10,12 @@ export default async (req, res) => {
 
 const getBusiness = async (req, res) => {
   try {
-    if (!req.body) return res.status(400).json({ msg: "Please add data." });
+    const session = await getSession({ req });
+    if (!session) return res.status(400).json({ msg: "Please login first." });
 
-    const { businessId } = req.body;
+    // const { businessId } = req.body;
+
+    const { businessId } = session.user;
     const business = await Business.findById(businessId);
 
     // if (!business) {

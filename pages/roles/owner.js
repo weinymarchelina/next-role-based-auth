@@ -18,11 +18,11 @@ const Owner = ({ user }) => {
       email,
       password,
     });
-    const { ids } = result.data;
+    const { businessForm } = result.data;
 
-    if (ids) {
+    if (businessForm) {
       const data = {
-        ...ids,
+        ...businessForm,
         role: "Owner",
       };
 

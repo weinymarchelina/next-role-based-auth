@@ -7,15 +7,22 @@ import bcrypt from "bcrypt";
 dbConnect();
 
 export default async (req, res) => {
-  await kickEmployee(req, res);
+  await switchRole(req, res);
 };
 
-const kickEmployee = async (req, res) => {
+const switchRole = async (req, res) => {
   try {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
-    const { inputPass, employeeId, employeeEmail, businessId } = req.body;
+    const {
+      inputPass,
+      ownerId,
+      ownerEmail,
+      employeeId,
+      employeeEmail,
+      businessId,
+    } = req.body;
 
     const business = await Business.findById(businessId);
     const isMatch = await bcrypt.compare(inputPass, business.password);
@@ -25,30 +32,38 @@ const kickEmployee = async (req, res) => {
       });
     }
 
-    // if (business.team.length === 1) {
-    //   return res.status(403).json({
-    //     msg: "Please have more people in the business account before resigning, or delete the business account first.",
-    //   });
-    // }
-
     await Business.updateOne(
-      { _id: businessId },
+      { _id: businessId, "team.email": ownerEmail },
       {
-        $pull: {
-          team: {
-            email: employeeEmail,
-          },
+        $set: {
+          "team.$.role": "Employee",
         },
-      },
+      }
+    );
+    await User.updateOne(
+      { _id: ownerId },
       {
-        multi: true,
+        role: "Employee",
       }
     );
 
-    await User.findByIdAndDelete(employeeId).then((user) => {
-      res.status(200).json({
-        msg: `You have kicked ${user.name}`,
-      });
+    await Business.updateOne(
+      { _id: businessId, "team.email": employeeEmail },
+      {
+        $set: {
+          "team.$.role": "Owner",
+        },
+      }
+    );
+    await User.updateOne(
+      { _id: employeeId },
+      {
+        role: "Owner",
+      }
+    );
+
+    res.status(200).json({
+      msg: `You have changed the role`,
     });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
