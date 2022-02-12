@@ -1,0 +1,58 @@
+// $primary: steelblue;
+$secondary: rgb(0, 183, 255);
+$error: firebrick;
+$success: green;
+$normal: calc(1rem + 1vw);
+$standard: 2rem;
+
+$colorMain: black;
+$colorBg: rgba(238, 238, 238, 0.507);
+$colorOne: rgba(219, 216, 216, 0.719);
+$colorTwo: rgba(20, 20, 20, 0.829);
+$shadowMain: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+$paddingSecond: calc(1.75rem + 3.25vw);
+$paddingMain: calc(2rem + 4.25vw);
+$padding10: calc(0.35rem + 0.25vw);
+$padding15: calc(0.5rem + 0.35vw);
+$padding20: calc(0.75rem + 0.5vw);
+$padding25: calc(1rem + 0.5vw);
+$padding30: calc(1rem + 0.75vw);
+$padding35: calc(1rem + 1vw);
+$padding50: calc(1.5rem + 1.35vw);
+$padding80: calc(1rem + 2vw);
+
+$letter5: calc(0.05rem + 0.02vw);
+$letter7: calc(0.1rem + 0.05vw);
+$letter10: calc(0.15rem + 0.15vw);
+$letter20: calc(0.25rem + 0.25vw);
+
+$text16: calc(0.5rem + 0.5vw);
+$text20: calc(0.5rem + 0.65vw);
+$text22: calc(0.5rem + 0.7vw);
+$text25: calc(0.75rem + 0.75vw);
+$text30: calc(1rem + 0.75vw);
+$text35: calc(1.25rem + 1vw);
+$text50: calc(1.5rem + 1.5vw);
+$text60: calc(2rem + 1.5vw);
+$text70: calc(2.5rem + 1.75vw);
+$text82: calc(2.75rem + 2vw);
+
+$width75: calc(3rem + 1.35vw);
+$width100: calc(4.05rem + 2vw);
+$width200: calc(7rem + 5vw);
+$width300: calc(10rem + 7.5vw);
+$width700: calc(20rem + 20vw);
+$width750: calc(22rem + 21.5vw);
+
+$colors: (
+  "blue": #1919e6,
+  "red": #e61919,
+  "yellow": #e6e619,
+  "green": #19e635,
+  "orange": #ffa600,
+  "purple": #9900ff,
+  "gray": #808080,
+  "black": black,
+  "white": white,
+);
