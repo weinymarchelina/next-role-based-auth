@@ -1,0 +1,18 @@
+.navContainer {
+  padding: 0 2rem;
+}
+
+.navLogo {
+}
+
+.navMobile {
+}
+
+.navLinks a {
+  margin-left: 2rem;
+  text-transform: uppercase;
+}
+
+.menuItem a {
+  color: black;
+}

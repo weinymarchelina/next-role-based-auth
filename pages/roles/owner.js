@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import { getSession, signIn } from "next-auth/react";
 import { setCookies } from "cookies-next";
+import {
+  Typography,
+  Container,
+  FormControl,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+} from "@mui/material";
 
 const Owner = ({ user }) => {
   const [name, setName] = useState("");
@@ -42,61 +51,87 @@ const Owner = ({ user }) => {
     }
   };
   return (
-    <div>
-      <h1>Business Form</h1>
-
+    <Container
+      sx={{
+        py: 5,
+      }}
+      maxWidth={"sm"}
+    >
       {!user && (
-        <form onSubmit={handleSubmit}>
-          <label>{`Business's Name`}</label>
-          <br />
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        <Card className="f-column" variant="outlined">
+          <CardContent sx={{ px: 4, py: 6 }}>
+            <Typography
+              className="main-title"
+              variant="h4"
+              component="h1"
+              sx={{ mb: 3 }}
+              gutterBottom
+            >
+              Business Form
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Business's Name"
+                  variant="standard"
+                  sx={{ mb: 4 }}
+                  fullWidth
+                  rows={1}
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
 
-          <br />
-          <br />
-          <label>Phone Number</label>
-          <br />
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
+                <TextField
+                  label="Phone Number"
+                  fullWidth
+                  rows={1}
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  sx={{ mb: 4 }}
+                  variant="standard"
+                  required
+                />
 
-          <br />
-          <br />
-          <label>Email</label>
-          <br />
+                <TextField
+                  label="Email"
+                  fullWidth
+                  rows={1}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  sx={{ mb: 4 }}
+                  variant="standard"
+                  required
+                />
 
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+                <TextField
+                  label="Password"
+                  fullWidth
+                  rows={1}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  sx={{ mb: 4 }}
+                  variant="standard"
+                  required
+                />
 
-          <br />
-          <br />
-          <label>Password</label>
-          <br />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          <br />
-          <br />
-
-          <button type="submit">Create</button>
-        </form>
+                <Button
+                  sx={{ width: "auto", p: 1, mb: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
+                  Create
+                </Button>
+              </FormControl>
+            </form>
+          </CardContent>
+        </Card>
       )}
-    </div>
+    </Container>
   );
 };
 

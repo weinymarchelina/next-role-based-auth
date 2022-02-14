@@ -25,7 +25,7 @@ const createOptions = (req, res) => ({
   theme: {
     colorScheme: "light",
     brandColor: "#202020",
-    logo: "/vercel.svg", // Absolute URL to image
+    logo: "/svg-auth.svg", // Absolute URL to image
   },
   session: { jwt: true },
   callbacks: {

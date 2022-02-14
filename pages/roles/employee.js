@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import { getSession, signIn } from "next-auth/react";
 import { setCookies } from "cookies-next";
+import {
+  Typography,
+  Container,
+  FormControl,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+} from "@mui/material";
 
 const Employee = ({ user }) => {
   const [email, setEmail] = useState("");
@@ -41,39 +50,66 @@ const Employee = ({ user }) => {
     }
   };
   return (
-    <div>
-      <h1>{`Join to your business' account`}</h1>
+    <Container
+      className="flex-row"
+      sx={{
+        py: 5,
+      }}
+      maxWidth={"sm"}
+    >
       {!user && (
-        <div className="body owner">
-          <form onSubmit={handleSubmit}>
-            <label>{`Business' Email`}</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        <Card className="f-column" variant="outlined">
+          <CardContent sx={{ px: 4, py: 6 }}>
+            <Typography
+              className="main-title"
+              variant="h4"
+              component="h1"
+              sx={{ mb: 5 }}
+              gutterBottom
+              textAlign={"center"}
+            >
+              {`Join to your business' account`}{" "}
+            </Typography>
 
-            <br />
-            <br />
+            <form onSubmit={handleSubmit}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Business' Email"
+                  variant="standard"
+                  sx={{ mb: 4 }}
+                  fullWidth
+                  rows={1}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
 
-            <br />
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+                <TextField
+                  label="Password"
+                  variant="standard"
+                  sx={{ mb: 4 }}
+                  fullWidth
+                  rows={1}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
 
-            <br />
-            <br />
-
-            <button type="submit">Join</button>
-          </form>
-        </div>
+                <Button
+                  sx={{ width: "auto", mb: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
+                  Join
+                </Button>
+              </FormControl>
+            </form>
+          </CardContent>
+        </Card>
       )}
-    </div>
+    </Container>
   );
 };
 

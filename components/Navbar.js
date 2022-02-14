@@ -1,6 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-import Styles from "../styles/Navbar.module.scss";
+import Styles from "../styles/Navbar.module.css";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import {
@@ -14,7 +14,7 @@ import {
   Button,
 } from "@mui/material";
 
-const links = ["Products", "Orders", "Report", "Settings"];
+const links = ["Dashboard", "Products", "Orders", "Report", "Settings"];
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -82,13 +82,13 @@ const Navbar = () => {
                     display: { xs: "block", md: "none" },
                   }}
                 >
-                  <MenuItem
+                  {/* <MenuItem
                     key="dashboard"
                     onClick={handleCloseNavMenu}
                     className={Styles.menuItem}
                   >
                     <Link href="/">Dashboard</Link>
-                  </MenuItem>
+                  </MenuItem> */}
                   {links.map((link) => (
                     <MenuItem
                       key={link}
@@ -108,13 +108,13 @@ const Navbar = () => {
               className={Styles.navLinks}
               sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}
             >
-              <Link
+              {/* <Link
                 key="dashboard"
                 href="/"
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 Dashboard
-              </Link>
+              </Link> */}
 
               {links.map((link) => (
                 <Link
