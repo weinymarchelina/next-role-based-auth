@@ -13,9 +13,6 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  TextField,
-  ButtonGroup,
-  Paper,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import EmployeeList from "../components/EmployeeList";
@@ -59,14 +56,12 @@ const Settings = ({ user }) => {
 
   const handleKick = async () => {
     try {
-      const res = await axios.post("/api/settings", {
+      await axios.post("/api/settings", {
         inputPass: password,
         businessId,
         employeeId: wantKick.userId,
         employeeEmail: wantKick.email,
       });
-      console.log(res.data.msg);
-      console.log(`You have kicked ${wantKick.name}`);
       window.location.reload();
     } catch (err) {
       setError(err.response.data.msg);
@@ -120,8 +115,7 @@ const Settings = ({ user }) => {
         employeeId: nextOwner.userId,
         employeeEmail: nextOwner.email,
       });
-      console.log(res.data.msg);
-      console.log(`You switched the role`);
+
       signOut({ callbackUrl: `${window.location.origin}/` });
       window.location.reload();
     } catch (err) {
@@ -181,13 +175,7 @@ const Settings = ({ user }) => {
       >
         Settings
       </Typography>
-      <Card
-        className="f-row"
-        variant="outlined"
-        size="small"
-        // sx={{ fontSize: "10px" }}
-        sx={{ p: 3 }}
-      >
+      <Card className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
         <CardContent
           className={matches ? "f-column" : "f-row"}
           sx={{ px: 5, width: "100%" }}
@@ -263,7 +251,6 @@ const Settings = ({ user }) => {
             className="f-row"
             variant="outlined"
             size="small"
-            // sx={{ fontSize: "10px" }}
             sx={{ p: 3, my: 5 }}
           >
             <CardContent

@@ -1,5 +1,5 @@
 import { Container, Typography, Button } from "@mui/material";
-import { getSession, signOut, signIn } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 const Dashboard = ({ user }) => {
   return (

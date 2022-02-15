@@ -9,12 +9,14 @@ import {
   TextField,
   Button,
   Card,
+  Box,
   CardContent,
 } from "@mui/material";
 
 const Employee = ({ user }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,16 +34,16 @@ const Employee = ({ user }) => {
           role: "Employee",
         };
 
-        console.log(data);
+        // console.log(data);
         setCookies("status", data);
         setEmail("");
         setPassword("");
 
-        // const res = await axios.get("/api/auth/session");
         signIn(null, {
           callbackUrl: `${window.location.origin}/`,
         });
       } else {
+        setError("Email or password is incorrect");
         throw new Error("Email or password is incorrect");
       }
     } catch (err) {
@@ -96,6 +98,25 @@ const Employee = ({ user }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+
+                {error && (
+                  <Box
+                    className="f-space"
+                    sx={{
+                      pl: 1,
+                      pb: 2,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      component="p"
+                      color="error.main"
+                    >
+                      {error}
+                    </Typography>
+                  </Box>
+                )}
 
                 <Button
                   sx={{ width: "auto", mb: 3 }}

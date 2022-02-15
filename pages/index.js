@@ -1,4 +1,4 @@
-import { getSession, signOut, signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { setCookies } from "cookies-next";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import BadgeIcon from "@mui/icons-material/Badge";
@@ -14,18 +14,7 @@ import {
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Home({ user }) {
-  console.log("current user info");
-  console.log(user);
-
-  const btnScreen = () => {
-    const matches = useMediaQuery("(max-width:600px)");
-
-    if (matches) {
-      return "vertical";
-    } else {
-      return "horizontal";
-    }
-  };
+  const matches = useMediaQuery("(max-width:600px)");
 
   return (
     <Container
@@ -64,7 +53,7 @@ export default function Home({ user }) {
             <ButtonGroup
               variant="contained"
               size="large"
-              orientation={btnScreen()}
+              orientation={matches ? "vertical" : "horizontal"}
             >
               <Button endIcon={<AddBusinessIcon />} sx={{ px: 3 }}>
                 <Link href="/roles/owner">business owner</Link>

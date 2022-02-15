@@ -1,6 +1,5 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-import Styles from "../styles/Navbar.module.css";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import {
@@ -17,7 +16,7 @@ import {
 const links = ["Dashboard", "Products", "Orders", "Report", "Settings"];
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [anchorElNav, setAnchorElNav] = useState(null);
 
   const handleOpenNavMenu = (event) => {
@@ -29,28 +28,21 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar className={Styles.navContainer} position="static">
+    <AppBar className="navContainer" position="static">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
-          <Box
-            className={Styles.navLogo}
-            sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
-          >
+          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             LOGO
           </Box>
 
           <Box
-            className={Styles.navMobile}
             sx={{
               flexGrow: 1,
               display: { xs: "flex", md: "none" },
               alignItems: "center",
             }}
           >
-            <Box
-              className={Styles.navLogo}
-              sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
-            >
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               LOGO
             </Box>
 
@@ -82,19 +74,8 @@ const Navbar = () => {
                     display: { xs: "block", md: "none" },
                   }}
                 >
-                  {/* <MenuItem
-                    key="dashboard"
-                    onClick={handleCloseNavMenu}
-                    className={Styles.menuItem}
-                  >
-                    <Link href="/">Dashboard</Link>
-                  </MenuItem> */}
                   {links.map((link) => (
-                    <MenuItem
-                      key={link}
-                      onClick={handleCloseNavMenu}
-                      className={Styles.menuItem}
-                    >
+                    <MenuItem key={link} onClick={handleCloseNavMenu}>
                       <Link href={`/${link.toLowerCase()}`}>{link}</Link>
                     </MenuItem>
                   ))}
@@ -105,17 +86,9 @@ const Navbar = () => {
 
           {session && (
             <Box
-              className={Styles.navLinks}
+              className="navLinks"
               sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}
             >
-              {/* <Link
-                key="dashboard"
-                href="/"
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                Dashboard
-              </Link> */}
-
               {links.map((link) => (
                 <Link
                   href={`/${link.toLowerCase()}`}

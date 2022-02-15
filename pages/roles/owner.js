@@ -35,7 +35,6 @@ const Owner = ({ user }) => {
         role: "Owner",
       };
 
-      console.log(data);
       setCookies("status", data);
 
       setName("");

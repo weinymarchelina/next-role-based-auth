@@ -7,12 +7,10 @@ const theme = createTheme({
       main: red[800],
     },
     secondary: {
-      // main: "#e1c19a",
       main: "#fff",
     },
 
     typography: {
-      // htmlFontSize: 20,
       fontFamily: "Nunito",
       fontWeightLight: 400,
       fontWeightRegular: 500,
