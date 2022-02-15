@@ -55,3 +55,7 @@ img {
 @media only screen and (max-width: 720px) {
   /**/
 }
+
+div.nav-link a {
+  padding-left: calc(1vw+ 1rem);
+}

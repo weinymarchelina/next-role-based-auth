@@ -18,6 +18,15 @@ export default Dashboard;
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 
+  if (session) {
+    return {
+      redirect: {
+        destination: "/settings",
+        permanent: false,
+      },
+    };
+  }
+
   if (!session) {
     return {
       redirect: {
