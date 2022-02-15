@@ -13,8 +13,13 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  TextField,
+  ButtonGroup,
+  Paper,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import EmployeeList from "../components/EmployeeList";
+import PasswordChecker from "../components/PasswordChecker";
 
 const Settings = ({ user }) => {
   const { businessId, userId, role } = user;
@@ -25,8 +30,21 @@ const Settings = ({ user }) => {
   const [changeRole, setChangeRole] = useState(false);
   const [nextOwner, setNextOwner] = useState(null);
   const [deleteAcc, setDeleteAcc] = useState(false);
+  const [error, setError] = useState(null);
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:450px)");
+
+  const propsRole = {
+    matches,
+    business,
+    setChangeRole,
+    nextOwner,
+    setNextOwner,
+    error,
+    setError,
+    password,
+    setPassword,
+  };
 
   useEffect(async () => {
     try {
@@ -51,8 +69,8 @@ const Settings = ({ user }) => {
       console.log(`You have kicked ${wantKick.name}`);
       window.location.reload();
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response?.data.msg);
+      setError(err.response.data.msg);
+      return;
     }
   };
 
@@ -66,8 +84,8 @@ const Settings = ({ user }) => {
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response?.data.msg);
+      setError(err.response.data.msg);
+      return;
     }
   };
 
@@ -79,18 +97,25 @@ const Settings = ({ user }) => {
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response?.data.msg);
+      setError(err.response.data.msg);
+      return;
     }
   };
 
-  const handleRole = async () => {
-    console.log("Change Role!");
+  const handleRole = async (e) => {
+    e.preventDefault();
+
+    setError(null);
+    if (nextOwner == null) {
+      setError("Please select an employee to be the next owner");
+      return;
+    }
+
     try {
       const res = await axios.post("/api/role", {
         inputPass: password,
         businessId,
-        ownerId: userId,
+        ownerId: user.userId,
         ownerEmail: user.email,
         employeeId: nextOwner.userId,
         employeeEmail: nextOwner.email,
@@ -100,9 +125,43 @@ const Settings = ({ user }) => {
       signOut({ callbackUrl: `${window.location.origin}/` });
       window.location.reload();
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response?.data.msg);
+      setError(err.response.data.msg);
+      return;
     }
+  };
+
+  const propsBase = {
+    matches,
+    password,
+    setPassword,
+    error,
+    setError,
+  };
+
+  const propsDelete = {
+    ...propsBase,
+    command:
+      "Please input the company password to delete the whole business account",
+    action: "Delete",
+    handle: handleDeleteAcc,
+    setState: setDeleteAcc,
+  };
+
+  const propsKick = {
+    ...propsBase,
+    command: `Please input the company password to kick ${wantKick?.name}`,
+    action: "Kick",
+    handle: handleKick,
+    setState: setWantKick,
+  };
+
+  const propsResign = {
+    ...propsBase,
+    command: `Please input the company password to
+    resign`,
+    action: "Resign",
+    handle: handleResign,
+    setState: setResign,
   };
 
   return (
@@ -199,300 +258,228 @@ const Settings = ({ user }) => {
       </Card>
 
       {business && (
-        <Card
-          className="f-row"
-          variant="outlined"
-          size="small"
-          // sx={{ fontSize: "10px" }}
-          sx={{ p: 3, my: 5 }}
-        >
-          <CardContent
-            sx={{ padding: `${matches ? "0 1rem" : "0 2rem"}`, width: "100%" }}
+        <>
+          <Card
+            className="f-row"
+            variant="outlined"
+            size="small"
+            // sx={{ fontSize: "10px" }}
+            sx={{ p: 3, my: 5 }}
           >
-            <Typography
-              className="main-title"
-              variant="h5"
-              component="h2"
-              sx={{ mb: 3 }}
-              gutterBottom
-            >
-              Business Info
-            </Typography>
-
-            <Box
-              className="f-col"
+            <CardContent
               sx={{
-                flex: 1,
-                alignSelf: `${matches ? "center" : "flex-end"}`,
-                mt: 5,
+                padding: `${matches ? "0 1rem" : "0 2rem"}`,
+                width: "100%",
               }}
             >
-              <Box
-                sx={{
-                  borderBottom: 1,
-                  borderColor: "text.secondary",
-                  px: 1,
-                  pb: 1,
-                  mb: 3,
-                }}
-                className={matches ? "f-col" : "f-space"}
+              <Typography
+                className="main-title"
+                variant="h5"
+                component="h2"
+                sx={{ mb: 3 }}
+                gutterBottom
               >
-                <Typography sx={{ fontWeight: 600 }}>Name</Typography>
-                <Typography>{business.name}</Typography>
-              </Box>
+                Business Info
+              </Typography>
+
               <Box
-                sx={{
-                  borderBottom: 1,
-                  borderColor: "text.secondary",
-                  px: 1,
-                  pb: 1,
-                  mb: 3,
-                }}
-                className={matches ? "f-col" : "f-space"}
-              >
-                <Typography sx={{ fontWeight: 600 }}>Phone Number</Typography>
-                <Typography>{business.phone}</Typography>
-              </Box>
-              <Box
-                sx={{
-                  borderBottom: 1,
-                  borderColor: "text.secondary",
-                  px: 1,
-                  pb: 1,
-                  mb: 3,
-                }}
-                className={matches ? "f-col" : "f-space"}
-              >
-                <Typography sx={{ fontWeight: 600 }}>Email</Typography>
-                <Typography>{business.email}</Typography>
-              </Box>
-              <Box
-                sx={{
-                  px: 1,
-                  pb: 1,
-                  mb: 3,
-                }}
                 className="f-col"
+                sx={{
+                  flex: 1,
+                  alignSelf: `${matches ? "center" : "flex-end"}`,
+                  mt: 5,
+                }}
               >
-                <Typography sx={{ fontWeight: 600 }}>Team</Typography>
-                <Box>
-                  <List>
-                    {business.team
-                      .sort((a, b) => {
-                        if (a == b) return 0;
-                        return a.role > b.role ? -1 : 1;
-                      })
-                      .map((member) => {
-                        return (
-                          <ListItem
-                            key={member.userId}
-                            sx={{
-                              display: "flex",
-                              border: 1,
-                              borderColor: "#bbb",
-                              borderRadius: "1vw",
-                              mt: 2,
-                              p: 3,
-                            }}
-                            className={stacks ? "f-col" : "flex"}
-                          >
-                            <ListItemAvatar sx={{ flex: `${matches ? 3 : 1}` }}>
-                              <Avatar
-                                sx={{ width: "100%", height: "100%" }}
-                                src={member.picture}
-                                alt={`${member.name}'s profile picture`}
-                              />
-                            </ListItemAvatar>
-                            <Box
-                              className={matches ? "f-col" : "f-row"}
-                              sx={{
-                                marginLeft: `${stacks ? "0rem" : "2rem"}`,
-                                flex: `${matches ? 5 : 8}`,
-                              }}
-                            >
-                              <ListItemText
-                                className={stacks ? "f-column" : "f-col"}
-                                primary={member.name}
-                                secondary={member.role}
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: "text.secondary",
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className={matches ? "f-col" : "f-space"}
+                >
+                  <Typography sx={{ fontWeight: 600 }}>Name</Typography>
+                  <Typography>{business.name}</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: "text.secondary",
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className={matches ? "f-col" : "f-space"}
+                >
+                  <Typography sx={{ fontWeight: 600 }}>Phone Number</Typography>
+                  <Typography>{business.phone}</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: "text.secondary",
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className={matches ? "f-col" : "f-space"}
+                >
+                  <Typography sx={{ fontWeight: 600 }}>Email</Typography>
+                  <Typography>{business.email}</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className="f-col"
+                >
+                  <Typography sx={{ fontWeight: 600 }}>Team</Typography>
+                  <Box>
+                    <List>
+                      {business.team
+                        .sort((a, b) => {
+                          if (a == b) return 0;
+                          return a.role > b.role ? -1 : 1;
+                        })
+                        .map((member) => {
+                          return (
+                            <>
+                              <ListItem
+                                key={member.userId}
                                 sx={{
-                                  flex: 5,
-                                  marginTop: `${stacks ? "1.5rem" : "0"}`,
-                                  marginBottom: `${matches ? "1.5rem" : "0"}`,
-                                }}
-                              />
-
-                              <Box
-                                sx={{
-                                  flex: 3,
                                   display: "flex",
-                                  justifyContent: `${
-                                    matches ? "flex-start" : "flex-end"
-                                  }`,
+                                  border: 1,
+                                  borderColor: "#bbb",
+                                  borderRadius: "1vw",
+                                  mt: 2,
+                                  p: 3,
                                 }}
+                                className={stacks ? "f-col" : "flex"}
                               >
-                                {!changeRole &&
-                                  role === "Owner" &&
-                                  member.role === "Owner" &&
-                                  business.team.length > 1 && (
-                                    <Button
-                                      variant="outlined"
-                                      size="small"
-                                      onClick={() => setChangeRole(true)}
-                                    >
-                                      Change Role
-                                    </Button>
-                                  )}
-
-                                {!deleteAcc &&
-                                  role === "Owner" &&
-                                  member.role === "Owner" &&
-                                  business.team.length === 1 && (
-                                    <Button
-                                      variant="outlined"
-                                      size="small"
-                                      onClick={() => setDeleteAcc(true)}
-                                    >
-                                      Delete Business Account
-                                    </Button>
-                                  )}
-
-                                {!wantKick &&
-                                  role === "Owner" &&
-                                  member.role === "Employee" && (
-                                    <Button
-                                      variant="outlined"
-                                      size="small"
-                                      onClick={() => setWantKick(member)}
-                                    >
-                                      Kick Employee
-                                    </Button>
-                                  )}
-
-                                {role === "Employee" &&
-                                  member.userId === userId && (
-                                    <Button
-                                      variant="outlined"
-                                      size="small"
-                                      onClick={() => setResign(true)}
-                                    >
-                                      Resign
-                                    </Button>
-                                  )}
-                              </Box>
-                            </Box>
-                            {changeRole && member.role === "Owner" && (
-                              <div>
-                                <p>
-                                  Please set the next owner and input the
-                                  company password to change role into Employee
-                                </p>
-
-                                {business.team.map((member) => {
-                                  if (member.role === "Employee")
-                                    return (
-                                      <li
-                                        key={member.userId}
-                                        style={
-                                          nextOwner?.userId === member.userId
-                                            ? { backgroundColor: "#aaaaaa" }
-                                            : {
-                                                backgroundColor: "transparent",
-                                              }
-                                        }
-                                      >
-                                        <p>{member.name}</p>
-                                        <button
-                                          onClick={() => setNextOwner(member)}
-                                        >
-                                          Select
-                                        </button>
-                                      </li>
-                                    );
-                                })}
-
-                                <input
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  required
-                                />
-                                <button onClick={handleRole}>Change</button>
-                                <button
-                                  onClick={() => {
-                                    setChangeRole(false);
-                                    setNextOwner(null);
+                                <ListItemAvatar
+                                  key={member.name}
+                                  sx={{ flex: `${matches ? 3 : 1}` }}
+                                >
+                                  <Avatar
+                                    sx={{ width: "100%", height: "100%" }}
+                                    src={member.picture}
+                                    alt={`${member.name}'s profile picture`}
+                                  />
+                                </ListItemAvatar>
+                                <Box
+                                  className={matches ? "f-col" : "f-row"}
+                                  sx={{
+                                    marginLeft: `${stacks ? "0rem" : "2rem"}`,
+                                    flex: `${matches ? 5 : 8}`,
                                   }}
                                 >
-                                  Cancel
-                                </button>
-                              </div>
-                            )}
-                            {deleteAcc && (
-                              <div>
-                                <p>
-                                  Please input the company password to delete
-                                  the whole business account
-                                </p>
-                                <input
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  required
-                                />
-                                <button onClick={handleDeleteAcc}>
-                                  Delete
-                                </button>
-                                <button
-                                  onClick={() => setResignDeleteAcc(false)}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            )}
-                            {wantKick === member && (
-                              <div>
-                                <p>
-                                  Please input the company password to kick{" "}
-                                  {wantKick.name}
-                                </p>
-                                <input
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  required
-                                />
-                                <button onClick={handleKick}>Kick</button>
-                                <button onClick={() => setWantKick(null)}>
-                                  Cancel
-                                </button>
-                              </div>
-                            )}
-                            {resign && resign === member && (
-                              <div>
-                                <p>
-                                  Please input the company password to resign
-                                </p>
-                                <input
-                                  type="password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  required
-                                />
-                                <button onClick={handleResign}>Resign</button>
-                                <button onClick={() => setResign(false)}>
-                                  Cancel
-                                </button>
-                              </div>
-                            )}
-                          </ListItem>
-                        );
-                      })}
-                  </List>
+                                  <ListItemText
+                                    key={member.name}
+                                    className={stacks ? "f-column" : "f-col"}
+                                    primary={member.name}
+                                    secondary={member.role}
+                                    sx={{
+                                      textAlign: `${
+                                        stacks ? "center" : "left"
+                                      }`,
+                                      flex: 5,
+                                      marginTop: `${stacks ? "1.5rem" : "0"}`,
+                                      marginBottom: `${
+                                        matches ? "1.5rem" : "0"
+                                      }`,
+                                    }}
+                                  />
+
+                                  <Box
+                                    sx={{
+                                      flex: 3,
+                                      display: "flex",
+                                      justifyContent: `${
+                                        matches ? "flex-start" : "flex-end"
+                                      }`,
+                                    }}
+                                  >
+                                    {!changeRole &&
+                                      role === "Owner" &&
+                                      member.role === "Owner" &&
+                                      business.team.length > 1 && (
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={() => setChangeRole(true)}
+                                        >
+                                          Change Role
+                                        </Button>
+                                      )}
+
+                                    {!deleteAcc &&
+                                      role === "Owner" &&
+                                      member.role === "Owner" &&
+                                      business.team.length === 1 && (
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={() => setDeleteAcc(true)}
+                                        >
+                                          Delete Business Account
+                                        </Button>
+                                      )}
+
+                                    {!wantKick &&
+                                      role === "Owner" &&
+                                      member.role === "Employee" && (
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={() => setWantKick(member)}
+                                        >
+                                          Kick Employee
+                                        </Button>
+                                      )}
+
+                                    {role === "Employee" &&
+                                      member.userId === userId && (
+                                        <Button
+                                          variant="outlined"
+                                          size="small"
+                                          onClick={() => setResign(member)}
+                                        >
+                                          Resign
+                                        </Button>
+                                      )}
+                                  </Box>
+                                </Box>
+                              </ListItem>
+                              <Box className="action-password">
+                                {changeRole && member.role === "Owner" && (
+                                  <form onSubmit={handleRole}>
+                                    <EmployeeList props={propsRole} />
+                                  </form>
+                                )}
+                                {deleteAcc && (
+                                  <PasswordChecker props={propsDelete} />
+                                )}
+                                {wantKick === member && (
+                                  <PasswordChecker props={propsKick} />
+                                )}
+                                {resign && resign === member && (
+                                  <PasswordChecker props={propsResign} />
+                                )}
+                              </Box>
+                            </>
+                          );
+                        })}
+                    </List>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </>
       )}
     </Container>
   );

@@ -28,7 +28,7 @@ const switchRole = async (req, res) => {
     const isMatch = await bcrypt.compare(inputPass, business.password);
     if (!isMatch) {
       return res.status(403).json({
-        msg: "Password is incorrect.",
+        msg: "Password is incorrect",
       });
     }
 

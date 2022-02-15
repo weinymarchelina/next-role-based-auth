@@ -21,15 +21,9 @@ const kickEmployee = async (req, res) => {
     const isMatch = await bcrypt.compare(inputPass, business.password);
     if (!isMatch) {
       return res.status(403).json({
-        msg: "Password is incorrect.",
+        msg: "Password is incorrect",
       });
     }
-
-    // if (business.team.length === 1) {
-    //   return res.status(403).json({
-    //     msg: "Please have more people in the business account before resigning, or delete the business account first.",
-    //   });
-    // }
 
     await Business.updateOne(
       { _id: businessId },
