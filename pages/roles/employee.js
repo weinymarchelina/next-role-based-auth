@@ -47,8 +47,7 @@ const Employee = ({ user }) => {
         throw new Error("Email or password is incorrect");
       }
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response.data.msg);
+      setError(err.response.data.msg);
     }
   };
   return (
