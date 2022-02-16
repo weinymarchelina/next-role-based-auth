@@ -56,6 +56,10 @@ img {
   /**/
 }
 
-div.nav-link a {
-  padding-left: calc(1vw+ 1rem);
+footer {
+  background-color: firebrick;
+  color: white;
+  text-align: right;
+  padding: 1rem;
+  font-size: calc(0.25vw + 0.75rem);
 }

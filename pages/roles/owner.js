@@ -53,6 +53,7 @@ const Owner = ({ user }) => {
     <Container
       sx={{
         py: 5,
+        minHeight: "100vh",
       }}
       maxWidth={"sm"}
     >

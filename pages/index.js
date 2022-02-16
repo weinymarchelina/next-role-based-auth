@@ -21,6 +21,7 @@ export default function Home({ user }) {
       className="flex-row"
       sx={{
         py: 5,
+        minHeight: "100vh",
       }}
       maxWidth={"md"}
     >

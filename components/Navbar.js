@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const links = ["Dashboard", "Products", "Orders", "Report", "Settings"];
+const links = ["Settings"];
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -88,9 +88,12 @@ const Navbar = () => {
           {session && (
             <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
               {links.map((link) => (
-                <Link href={`/${link.toLowerCase()}`} key={link}>
-                  <Typography sx={{ paddingLeft: 2 }}>{link}</Typography>
-                </Link>
+                <Typography
+                  key={link}
+                  sx={{ paddingLeft: 2, textTransform: "uppercase" }}
+                >
+                  <Link href={`/${link.toLowerCase()}`}>{link}</Link>
+                </Typography>
               ))}
             </Box>
           )}
