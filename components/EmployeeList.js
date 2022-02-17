@@ -45,6 +45,8 @@ const EmployeeList = (propsRole) => {
                   <ListItem
                     className="f-space"
                     sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
                       flexWrap: "wrap",
                       border: 1,
                       borderRadius: ".5vw",
