@@ -507,7 +507,15 @@ const Settings = ({ user }) => {
                       )}
 
                       {successMsg && (
-                        <Container className="f-column">
+                        <Container
+                          className="f-column"
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
                           <CheckCircle
                             color="success"
                             sx={{ m: 2, fontSize: 100 }}
@@ -623,7 +631,15 @@ const Settings = ({ user }) => {
                       )}
 
                       {successMsg && (
-                        <Container className="f-column">
+                        <Container
+                          className="f-column"
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
                           <CheckCircle
                             color="success"
                             sx={{ m: 2, fontSize: 100 }}
