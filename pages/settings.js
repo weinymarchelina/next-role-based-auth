@@ -13,21 +13,46 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  IconButton,
+  Modal,
+  FormControl,
+  TextField,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import EmployeeList from "../components/EmployeeList";
 import PasswordChecker from "../components/PasswordChecker";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ErrorWarning from "../components/ErrorWarning";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import EditIcon from "@mui/icons-material/Edit";
 
 const Settings = ({ user }) => {
   const { businessId, userId, role } = user;
   const [business, setBusiness] = useState(null);
+
   const [password, setPassword] = useState("");
   const [wantKick, setWantKick] = useState(null);
   const [resign, setResign] = useState(false);
   const [changeRole, setChangeRole] = useState(false);
   const [nextOwner, setNextOwner] = useState(null);
   const [deleteAcc, setDeleteAcc] = useState(false);
+
   const [error, setError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
+
+  const [modal, setModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [promoted, setPromoted] = useState(null);
+
+  const [newPassword, setNewPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:450px)");
 
@@ -46,17 +71,106 @@ const Settings = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/business");
-      const { business: businessData } = res.data;
+      const { business: businessData, promoted, userStatus } = res.data;
+
       setBusiness(businessData);
+      setPromoted(promoted);
+
+      if (!userStatus) {
+        signOut({ callbackUrl: `${window.location.origin}/` });
+      }
     } catch (err) {
-      console.log(err.message);
+      // console.log(err.message);
       throw new Error(err.message);
     }
   }, []);
 
+  const handleClose = () => {
+    setModal(false);
+    setPasswordError(null);
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setSuccessMsg(null);
+  };
+
+  const handleEditClose = () => {
+    setEditModal(false);
+    setError(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setPassword("");
+    setSuccessMsg(null);
+  };
+
+  const handlePassword = async (e) => {
+    e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError(`New password and confirm new password don't match`);
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/settings/password", {
+        oldPassword,
+        newPassword,
+        businessId,
+      });
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setSuccessMsg(res.data.msg);
+    } catch (err) {
+      setPasswordError(err.response?.data.msg);
+
+      return;
+    }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+
+    if (!name && !phone & !email) {
+      setError(`Please input at least one of the fields`);
+      return;
+    } else if (
+      name === business.name &&
+      Number(phone) === business.phone &&
+      email === business.email
+    ) {
+      setError(`New information and old information cannot be the same`);
+      return;
+    }
+
+    const newName = name || business.name;
+    const newPhone = phone || business.phone;
+    const newEmail = email || business.email;
+
+    try {
+      const res = await axios.post("/api/settings/edit", {
+        newName,
+        newPhone,
+        newEmail,
+        password,
+        businessId,
+      });
+      setName("");
+      setPhone("");
+      setEmail("");
+      setPassword("");
+      setSuccessMsg(res.data.msg);
+    } catch (err) {
+      setError(err.response?.data.msg);
+
+      return;
+    }
+  };
+
   const handleKick = async () => {
     try {
-      await axios.post("/api/settings", {
+      await axios.post("/api/settings/", {
         inputPass: password,
         businessId,
         employeeId: wantKick.userId,
@@ -71,7 +185,7 @@ const Settings = ({ user }) => {
 
   const handleResign = async () => {
     try {
-      await axios.post("/api/settings", {
+      await axios.post("/api/settings/", {
         inputPass: password,
         businessId,
         employeeId: userId,
@@ -86,7 +200,7 @@ const Settings = ({ user }) => {
 
   const handleDeleteAcc = async () => {
     try {
-      await axios.post("/api/delete", {
+      await axios.post("/api/settings/delete", {
         inputPass: password,
         businessId,
       });
@@ -107,7 +221,7 @@ const Settings = ({ user }) => {
     }
 
     try {
-      const res = await axios.post("/api/role", {
+      await axios.post("/api/settings/role", {
         inputPass: password,
         businessId,
         ownerId: user.userId,
@@ -135,7 +249,7 @@ const Settings = ({ user }) => {
   const propsDelete = {
     ...propsBase,
     command:
-      "Please input the company password to delete the whole business account",
+      "Input the business' password to delete the whole business account. Warning: this action is irreversible",
     action: "Delete",
     handle: handleDeleteAcc,
     setState: setDeleteAcc,
@@ -143,7 +257,7 @@ const Settings = ({ user }) => {
 
   const propsKick = {
     ...propsBase,
-    command: `Please input the company password to kick ${wantKick?.name}`,
+    command: `Input the business' password to kick ${wantKick?.name}`,
     action: "Kick",
     handle: handleKick,
     setState: setWantKick,
@@ -151,18 +265,29 @@ const Settings = ({ user }) => {
 
   const propsResign = {
     ...propsBase,
-    command: `Please input the company password to
+    command: `Input the business' password to
     resign`,
     action: "Resign",
     handle: handleResign,
     setState: setResign,
   };
 
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: `${matches ? "95vw" : "calc(28rem + 35vw)"}`,
+    transform: "translate(-50%, -50%)",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 5,
+    mr: 1,
+  };
+
   return (
     <Container
       sx={{
         py: 5,
-        minHeight: "100vh",
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
@@ -248,6 +373,28 @@ const Settings = ({ user }) => {
 
       {business && (
         <>
+          <Modal open={promoted}>
+            <Box sx={modalStyle} className="f-col">
+              <Typography variant="h6" component="p">
+                Congratulations! You have been promoted as the new owner of{" "}
+                {business.name}! Please sign out to change your role into the
+                owner.{" "}
+              </Typography>
+              <Button
+                sx={{
+                  px: 2,
+                  mt: 3,
+                  alignSelf: `${matches ? "none" : "flex-end"}`,
+                }}
+                variant="contained"
+                onClick={() => {
+                  signOut({ callbackUrl: `${window.location.origin}/` });
+                }}
+              >
+                Sign Out
+              </Button>
+            </Box>
+          </Modal>
           <Card
             className="f-row"
             variant="outlined"
@@ -260,15 +407,268 @@ const Settings = ({ user }) => {
                 width: "100%",
               }}
             >
-              <Typography
-                className="main-title"
-                variant="h5"
-                component="h2"
-                sx={{ mb: 3 }}
-                gutterBottom
+              <Box
+                className="f-space"
+                sx={{
+                  mt: 2,
+                  flex: 1,
+                  alignItems: "center",
+                }}
               >
-                Business Info
-              </Typography>
+                <Typography className="main-title" variant="h5" component="h2">
+                  Business Info
+                </Typography>
+
+                {role === "Owner" && (
+                  <Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        setEditModal(true);
+                        setChangeRole(false);
+                        setWantKick(null);
+                        setDeleteAcc(false);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="primary" onClick={() => setModal(true)}>
+                      <SettingsIcon />
+                    </IconButton>
+                  </Box>
+                )}
+              </Box>
+
+              <Modal open={editModal} onClose={handleEditClose}>
+                <Box sx={modalStyle}>
+                  <Typography
+                    className="main-title"
+                    variant={stacks ? "h6" : "h5"}
+                    component="h2"
+                    sx={{ mb: 3 }}
+                    textAlign="center"
+                  >
+                    Change Business Information
+                  </Typography>
+                  <form autoComplete="off" onSubmit={handleEdit}>
+                    <FormControl fullWidth>
+                      {!successMsg && (
+                        <>
+                          <Typography sx={{ mb: 2 }} textAlign="center">
+                            Input at least one of the fields below in order to
+                            change the information.{" "}
+                          </Typography>
+                          <TextField
+                            label="New Name"
+                            fullWidth
+                            rows={1}
+                            type="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="New Phone Number"
+                            fullWidth
+                            rows={1}
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="New Email"
+                            fullWidth
+                            rows={1}
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="Password"
+                            fullWidth
+                            rows={1}
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            variant="standard"
+                            required
+                          />
+
+                          {error && <ErrorWarning error={error} />}
+                        </>
+                      )}
+
+                      {successMsg && (
+                        <Container className="f-column">
+                          <CheckCircle
+                            color="success"
+                            sx={{ m: 2, fontSize: 100 }}
+                          />
+                          <Typography
+                            color="success.main"
+                            variant="h6"
+                            component="p"
+                            sx={{ width: "20ch" }}
+                            textAlign="center"
+                          >
+                            {successMsg}
+                          </Typography>
+                        </Container>
+                      )}
+
+                      <Box
+                        sx={{
+                          mt: 3,
+                          alignSelf: `${stacks ? "center" : "flex-end"}`,
+                        }}
+                      >
+                        {!successMsg && (
+                          <>
+                            <Button
+                              sx={{ px: 2, py: 1, mr: 1 }}
+                              size="small"
+                              type="submit"
+                              variant="contained"
+                            >
+                              Change
+                            </Button>
+                            <Button
+                              sx={{ px: 2, py: 1 }}
+                              onClick={handleEditClose}
+                              size="small"
+                              variant="outlined"
+                            >
+                              Close
+                            </Button>
+                          </>
+                        )}
+                        {successMsg && (
+                          <Button
+                            sx={{ px: 2, py: 1 }}
+                            onClick={() => window.location.reload()}
+                            size="small"
+                            variant="outlined"
+                          >
+                            Close
+                          </Button>
+                        )}
+                      </Box>
+                    </FormControl>
+                  </form>
+                </Box>
+              </Modal>
+
+              <Modal open={modal} onClose={handleClose}>
+                <Box sx={modalStyle}>
+                  <Typography
+                    className="main-title"
+                    variant={stacks ? "h6" : "h5"}
+                    component="h2"
+                    sx={{ mb: 3 }}
+                    textAlign="center"
+                  >
+                    Change Business Password
+                  </Typography>
+                  <form autoComplete="off" onSubmit={handlePassword}>
+                    <FormControl fullWidth>
+                      {!successMsg && (
+                        <>
+                          <TextField
+                            label="Current Password"
+                            fullWidth
+                            rows={1}
+                            type="password"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                            required
+                          />
+
+                          <TextField
+                            label="New Password"
+                            fullWidth
+                            rows={1}
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                            required
+                          />
+
+                          <TextField
+                            label="Confirm New Password"
+                            fullWidth
+                            rows={1}
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            variant="standard"
+                            required
+                          />
+
+                          {passwordError && (
+                            <ErrorWarning error={passwordError} />
+                          )}
+                        </>
+                      )}
+
+                      {successMsg && (
+                        <Container className="f-column">
+                          <CheckCircle
+                            color="success"
+                            sx={{ m: 2, fontSize: 100 }}
+                          />
+                          <Typography
+                            color="success.main"
+                            variant="h6"
+                            component="p"
+                            sx={{ width: "20ch" }}
+                            textAlign="center"
+                          >
+                            {successMsg}
+                          </Typography>
+                        </Container>
+                      )}
+
+                      <Box
+                        sx={{
+                          mt: 3,
+                          alignSelf: `${stacks ? "center" : "flex-end"}`,
+                        }}
+                      >
+                        {!successMsg && (
+                          <Button
+                            sx={{ px: 2, py: 1, mr: 1 }}
+                            size="small"
+                            type="submit"
+                            variant="contained"
+                          >
+                            Change
+                          </Button>
+                        )}
+                        <Button
+                          sx={{ px: 2, py: 1 }}
+                          onClick={handleClose}
+                          size="small"
+                          variant="outlined"
+                        >
+                          Close
+                        </Button>
+                      </Box>
+                    </FormControl>
+                  </form>
+                </Box>
+              </Modal>
 
               <Box
                 className="f-col"
@@ -398,7 +798,10 @@ const Settings = ({ user }) => {
                                         <Button
                                           variant="outlined"
                                           size="small"
-                                          onClick={() => setChangeRole(true)}
+                                          onClick={() => {
+                                            setChangeRole(true);
+                                            setWantKick(null);
+                                          }}
                                         >
                                           Change Role
                                         </Button>
@@ -423,7 +826,10 @@ const Settings = ({ user }) => {
                                         <Button
                                           variant="outlined"
                                           size="small"
-                                          onClick={() => setWantKick(member)}
+                                          onClick={() => {
+                                            setWantKick(member);
+                                            setChangeRole(false);
+                                          }}
                                         >
                                           Kick Employee
                                         </Button>
